@@ -72,30 +72,39 @@ export default function App() {
   };
 
   // Excel 数据组装，需要依赖XLSX库
-  const downloadExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(Array(10).fill(combinedData), {
-      // combinedData 为 object，这里可以设置字段的 key 对应的列，默认通过 Object.keys 排列
-      header: columns
-    });
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet);
+  const downloadExcel = (type) => {
+    return () => {
+      const worksheet = XLSX.utils.json_to_sheet(Array(10).fill(combinedData), {
+        // combinedData 为 object，这里可以设置字段的 key 对应的列，默认通过 Object.keys 排列
+        header: columns
+      });
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet);
 
-    /* fix headers */
-    XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: "A1" });
+      /* fix headers */
+      XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: "A1" });
 
-    /* calculate column width */
-    // const max_width = rows.reduce((w, r) => Math.max(w, r.name.length), 10);
-    // worksheet["!cols"] = [{ wch: 200 }];
+      /* calculate column width */
+      // const max_width = rows.reduce((w, r) => Math.max(w, r.name.length), 10);
+      // worksheet["!cols"] = [{ wch: 200 }];
 
-    const fileName = `now-${Date.now()}.xlsx`;
-    XLSX.writeFile(workbook, fileName, {
-      compression: true
-    });
+      const fileName = `now-${Date.now()}.${type}`;
+      XLSX.writeFile(workbook, fileName, {
+        compression: true
+      });
+    };
   };
   return (
     <div className="App">
-      <h1 onClick={downloadCSV}>点击下载CSV文件</h1>
-      <h1 onClick={downloadExcel}>点击下载Excel文件</h1>
+      <h1 onClick={downloadCSV}>
+        点击下载CSV文件——通过papaparse实现CSV文件导出
+      </h1>
+      <h1 onClick={downloadExcel("xlsx")}>
+        点击下载Excel文件——通过XLSX实现Excel文件导出
+      </h1>
+      <h1 onClick={downloadExcel("csv")}>
+        点击下载CSV文件——通过XLSX实现CSV文件导出
+      </h1>
     </div>
   );
 }
